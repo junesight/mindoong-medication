@@ -69,11 +69,11 @@
 <meta property="og:description" content="민둥아 건강하게 오래오래 함께하자 ❤️"/>
 <title>민둥이 복약 체크리스트</title>
 <meta name="description" content="민둥아 건강하게 오래오래 함께하자 ❤️"/>
-<meta property="og:image" content="https://junesight.github.io/mindoong-medication/og-image-00iwfoxv.png"/>
+<meta property="og:image" content="https://junesight.github.io/mindoong-medication/og-image-005j0n49.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://junesight.github.io/mindoong-medication/og-image-00iwfoxv.png"/>
+<meta name="twitter:image" content="https://junesight.github.io/mindoong-medication/og-image-005j0n49.png"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'6'%20fill%3D'%236366f1'%2F%3E%3Ctext%20x%3D'16'%20y%3D'22'%20text-anchor%3D'middle'%20font-size%3D'18'%20fill%3D'white'%20font-family%3D'sans-serif'%3E%EB%AF%BC%3C%2Ftext%3E%3C%2Fsvg%3E"/>
 <script src="https://cdn.tailwindcss.com"></script>
 </head><body><!DOCTYPE html>
@@ -111,13 +111,13 @@
   const STORAGE_KEY='dog-med-time-tracker-v1';
   const API_URL='https://script.google.com/macros/s/AKfycbxQ1XQjdBhl73orsvkka8hvLgB9MYU36ceE0yGxXsf4jCzaFJd2YQ4vyfs5Npx0cKof/exec';
   const START_DATE='2026-06-17';
-  const OINTMENT_ANCHOR='2026-06-17';
+  const OINTMENT_ANCHOR='2026-06-26';
   const timeSlots=[
     {id:'morning',icon:'🌤️',label:'아침',hint:'식후 체크',items:[{id:'earMed_morning',icon:'💊',name:'귀 염증약 (식후)',start:'2026-06-18'},{id:'eyeDrop_morning',icon:'👁️',name:'점안액',start:'2026-06-18'}]},
     {id:'lunch',icon:'☀️',label:'점심',hint:'점심 체크',items:[{id:'eyeDrop_lunch',icon:'👁️',name:'점안액',start:'2026-06-17'},{id:'ointment_lunch',icon:'🧴',name:'귀 연고',start:'2026-06-17',everyOtherDay:true}]},
     {id:'evening',icon:'🌙',label:'저녁',hint:'저녁 체크',items:[{id:'heart_evening',icon:'❤️',name:'심장영양제 (식사와 함께)',start:'2026-06-17'},{id:'earMed_evening',icon:'💊',name:'귀 염증약 (식후)',start:'2026-06-17'},{id:'eyeDrop_evening',icon:'👁️',name:'점안액',start:'2026-06-17'}]}
   ];
-  const defaultState={records:{'2026-06-17':{eyeDrop_lunch:{done:true,time:'낮'},ointment_lunch:{done:true,time:'낮'}}},history:[{date:'2026-06-17',label:'점심 · 점안액',done:true,time:'낮'},{date:'2026-06-17',label:'점심 · 귀 연고',done:true,time:'낮'}]};
+  const defaultState={records:{'2026-06-17':{eyeDrop_lunch:{done:true,time:'낮'},ointment_lunch:{done:true,time:'낮'}},'2026-06-26':{ointment_lunch:{done:true,time:'오늘'}}},history:[{date:'2026-06-26',label:'점심 · 귀 연고',done:true,time:'오늘'},{date:'2026-06-17',label:'점심 · 점안액',done:true,time:'낮'},{date:'2026-06-17',label:'점심 · 귀 연고',done:true,time:'낮'}]};
   const $=id=>document.getElementById(id);const pad=n=>String(n).padStart(2,'0');const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());const parseKey=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};const diffDays=(a,b)=>Math.floor((parseKey(a)-parseKey(b))/86400000);const actualToday=new Date();const actualTodayKey=keyOf(actualToday);let selectedDate=parseKey(actualTodayKey);let selectedKey=actualTodayKey;const timeNow=()=>new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});const dateText=d=>d.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'long'});const dayText=d=>d.toLocaleDateString('ko-KR',{weekday:'short'});
   let state=JSON.parse(JSON.stringify(defaultState));
   let pendingChanges={};
@@ -178,7 +178,11 @@
       const res=await fetch(API_URL,{cache:'no-store'});
       const data=await res.json();
       if(data.ok&&data.records){
-        state.records={...defaultState.records,...normalizeRemoteRecords(data.records)};
+        const remoteRecords=normalizeRemoteRecords(data.records);
+        state.records={...defaultState.records};
+        Object.entries(remoteRecords).forEach(([dateKey,items])=>{
+          state.records[dateKey]={...(state.records[dateKey]||{}),...items};
+        });
         save();
         render();
       }
